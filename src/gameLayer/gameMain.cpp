@@ -137,7 +137,7 @@ bool updateGame()
 
 	EndMode2D();
 
-	DrawFPS(10, 10);
+	//DrawFPS(10, 10);
 
 	return true;
 }

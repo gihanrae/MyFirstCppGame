@@ -6,7 +6,9 @@
 #include "assetManager.h"
 #include "gameMap.h"
 #include "helpers.h"
+#include "worldGenerator.h"
 #include <raymath.h>
+#include <imgui.h>
 
 
 struct  GameData
@@ -21,19 +23,7 @@ bool initGame()
 {
 	assetManager.loadAll();
 
-	gameData.gameMap.create(700, 500);
-
-	for (int i = 0; i < 700; i++)
-		for (int j = 0; j < 500; j++)
-		{
-			gameData.gameMap.getBlockUnsafe(i, j).type = Block::dirt;
-		}
-
-	gameData.gameMap.getBlockUnsafe(0, 0).type = Block::dirt;
-	gameData.gameMap.getBlockUnsafe(1, 1).type = Block::grass;
-	gameData.gameMap.getBlockUnsafe(2, 2).type = Block::goldBlock;
-	gameData.gameMap.getBlockUnsafe(3, 3).type = Block::glass;
-	gameData.gameMap.getBlockUnsafe(4, 4).type = Block::platform;
+	generateWorld(gameData.gameMap);
 
 	gameData.camera.target = { 0, 0 }; // world space center of view, we will use this as the camera position
 	gameData.camera.rotation = 0.0f;
@@ -53,10 +43,11 @@ bool updateGame()
 
 #pragma region camera movement
 
-	if (IsKeyDown(KEY_LEFT)) gameData.camera.target.x -= 7.f * deltaTime;
-	if (IsKeyDown(KEY_RIGHT)) gameData.camera.target.x += 7.f * deltaTime;
-	if (IsKeyDown(KEY_UP)) gameData.camera.target.y -= 7.f * deltaTime;
-	if (IsKeyDown(KEY_DOWN)) gameData.camera.target.y += 7.f * deltaTime;
+	static float CAMERA_SPEED = 10;
+	if (IsKeyDown(KEY_A)) gameData.camera.target.x -= CAMERA_SPEED * deltaTime;
+	if (IsKeyDown(KEY_D)) gameData.camera.target.x += CAMERA_SPEED * deltaTime;
+	if (IsKeyDown(KEY_W)) gameData.camera.target.y -= CAMERA_SPEED * deltaTime;
+	if (IsKeyDown(KEY_S)) gameData.camera.target.y += CAMERA_SPEED * deltaTime;
 
 #pragma endregion
 
@@ -133,11 +124,18 @@ bool updateGame()
 		WHITE
 	);
 
-#pragma endregion
-
 	EndMode2D();
 
-	//DrawFPS(10, 10);
+	ImGui::Begin("Game control");
+
+	ImGui::SliderFloat("Camera zoom:", &gameData.camera.zoom, 10, 150);
+	ImGui::SliderFloat("Camera speed:", &CAMERA_SPEED, 5, 30);
+
+	ImGui::End();
+
+#pragma endregion
+
+	DrawFPS(10, 10);
 
 	return true;
 }

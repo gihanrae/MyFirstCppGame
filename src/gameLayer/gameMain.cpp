@@ -11,6 +11,7 @@
 #include <imgui.h>
 #include <structure.h>
 #include <saveMap.h>
+#include <physics.h>
 
 
 struct  GameData
@@ -26,6 +27,8 @@ struct  GameData
 
 	char saveName[100] = {};
 
+	PhysicalEntity player;
+
 }gameData;
 
 AssetManager assetManager;
@@ -38,9 +41,13 @@ bool initGame()
 
 	generateWorld(gameData.gameMap);
 
-	gameData.camera.target = { 0, 0 }; // world space center of view, we will use this as the camera position
+	gameData.camera.target = { 20, 120 }; // world space center of view, we will use this as the camera position
 	gameData.camera.rotation = 0.0f;
 	gameData.camera.zoom = 100.0f;
+
+	gameData.player.teleport({ 20, 120 });
+	gameData.player.transform.w = 0.9f;
+	gameData.player.transform.h = 1.8f;
 
 	return true;
 }
@@ -59,10 +66,23 @@ bool updateGame()
 #pragma region camera movement
 
 	static float CAMERA_SPEED = 10;
-	if (IsKeyDown(KEY_A)) gameData.camera.target.x -= CAMERA_SPEED * deltaTime;
-	if (IsKeyDown(KEY_D)) gameData.camera.target.x += CAMERA_SPEED * deltaTime;
-	if (IsKeyDown(KEY_W)) gameData.camera.target.y -= CAMERA_SPEED * deltaTime;
-	if (IsKeyDown(KEY_S)) gameData.camera.target.y += CAMERA_SPEED * deltaTime;
+
+	if (IsKeyDown(KEY_A)) gameData.player.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_D)) gameData.player.transform.pos.x += CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_W)) gameData.player.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_S)) gameData.player.transform.pos.y += CAMERA_SPEED * GetFrameTime();
+
+#pragma endregion
+
+#pragma region entities
+
+	gameData.player.applyGravity();
+
+	gameData.player.updateForces(deltaTime);
+
+	gameData.camera.target = gameData.player.getPosition();
+
+	gameData.player.updateFinal();
 
 #pragma endregion
 
@@ -178,6 +198,24 @@ bool updateGame()
 
 		DrawRectangleLinesEx(rect, 0.05, {20, 101, 250, 145});
 	}
+
+	Transform2D playerSprite = gameData.player.transform;
+	playerSprite.w = 1;
+	playerSprite.h = 2;
+	//move the sprite so that the bottom of the sprite matches the bottom of the collider
+	playerSprite.pos.y -= (playerSprite.h - gameData.player.transform.h) / 2;
+
+	DrawTexturePro(
+		assetManager.player,
+		{ 0, 0, (float)assetManager.player.width, (float)assetManager.player.height },
+		playerSprite.getAABB(),
+		{ 0, 0 }, //origin
+		0.0f, // rotation
+		WHITE
+	);
+
+	DrawRectangleLinesEx(gameData.player.transform.getAABB(), 0.1,
+		{ 20, 101, 250, 120 });
 
 	EndMode2D();
 

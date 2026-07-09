@@ -45,7 +45,7 @@ bool initGame()
 	gameData.camera.rotation = 0.0f;
 	gameData.camera.zoom = 100.0f;
 
-	gameData.player.teleport({ 20, 120 });
+	gameData.player.teleport({ 20, 60 });
 	gameData.player.transform.w = 0.9f;
 	gameData.player.transform.h = 1.8f;
 
@@ -79,6 +79,8 @@ bool updateGame()
 	gameData.player.applyGravity();
 
 	gameData.player.updateForces(deltaTime);
+
+	gameData.player.checkCollisionOnce(gameData.player.transform.pos, gameData.gameMap);
 
 	gameData.camera.target = gameData.player.getPosition();
 

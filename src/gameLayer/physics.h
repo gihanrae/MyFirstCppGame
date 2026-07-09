@@ -1,51 +1,52 @@
 #pragma once
 #include <raylib.h>
 #include <raymath.h>
+#include <cmath>
 
 // Vector2 operator overloads
-inline Vector2 operator+(const Vector2& a, const Vector2& b)
+inline Vector2 operator+(const Vector2 &a, const Vector2 &b)
 {
-	return { a.x + b.x, a.y + b.y };
+	return {a.x + b.x, a.y + b.y};
 }
 
-inline Vector2 operator-(const Vector2& a, const Vector2& b)
+inline Vector2 operator-(const Vector2 &a, const Vector2 &b)
 {
-	return { a.x - b.x, a.y - b.y };
+	return {a.x - b.x, a.y - b.y};
 }
 
-inline Vector2 operator*(const Vector2& a, float scalar)
+inline Vector2 operator*(const Vector2 &a, float scalar)
 {
-	return { a.x * scalar, a.y * scalar };
+	return {a.x * scalar, a.y * scalar};
 }
 
-inline Vector2 operator/(const Vector2& a, float scalar)
+inline Vector2 operator/(const Vector2 &a, float scalar)
 {
-	return { a.x / scalar, a.y / scalar };
+	return {a.x / scalar, a.y / scalar};
 }
 
 
-inline Vector2& operator*=(Vector2& a, float scalar)
+inline Vector2 &operator*=(Vector2 &a, float scalar)
 {
 	a.x *= scalar;
 	a.y *= scalar;
 	return a;
 }
 
-inline Vector2& operator/=(Vector2& a, float scalar)
+inline Vector2 &operator/=(Vector2 &a, float scalar)
 {
 	a.x /= scalar;
 	a.y /= scalar;
 	return a;
 }
 
-inline Vector2& operator+=(Vector2& a, float scalar)
+inline Vector2 &operator+=(Vector2 &a, float scalar)
 {
 	a.x += scalar;
 	a.y += scalar;
 	return a;
 }
 
-inline Vector2& operator-=(Vector2& a, float scalar)
+inline Vector2 &operator-=(Vector2 &a, float scalar)
 {
 	a.x -= scalar;
 	a.y -= scalar;
@@ -53,38 +54,38 @@ inline Vector2& operator-=(Vector2& a, float scalar)
 }
 
 
-inline bool operator==(const Vector2& a, const Vector2& b)
+inline bool operator==(const Vector2 &a, const Vector2 &b)
 {
 	return a.x == b.x && a.y == b.y;
 }
 
-inline bool operator!=(const Vector2& a, const Vector2& b)
+inline bool operator!=(const Vector2 &a, const Vector2 &b)
 {
 	return !(a == b);
 }
 
-inline Vector2& operator+=(Vector2& a, const Vector2& b)
+inline Vector2 &operator+=(Vector2 &a, const Vector2 &b)
 {
 	a.x += b.x;
 	a.y += b.y;
 	return a;
 }
 
-inline Vector2& operator-=(Vector2& a, const Vector2& b)
+inline Vector2 &operator-=(Vector2 &a, const Vector2 &b)
 {
 	a.x -= b.x;
 	a.y -= b.y;
 	return a;
 }
 
-inline Vector2& operator*=(Vector2& a, const Vector2& b)
+inline Vector2 &operator*=(Vector2 &a, const Vector2 &b)
 {
 	a.x *= b.x;
 	a.y *= b.y;
 	return a;
 }
 
-inline Vector2& operator/=(Vector2& a, const Vector2& b)
+inline Vector2 &operator/=(Vector2 &a, const Vector2 &b)
 {
 	a.x /= b.x;
 	a.y /= b.y;
@@ -98,20 +99,20 @@ struct Transform2D
 	float w = 0;
 	float h = 0;
 
-	Vector2 getCenter()       const { return { pos.x, pos.y }; }
-	Vector2 getTop()          const { return { pos.x, pos.y - h * 0.5f }; }
-	Vector2 getBottom()       const { return { pos.x, pos.y + h * 0.5f }; }
-	Vector2 getLeft()         const { return { pos.x - w * 0.5f, pos.y }; }
-	Vector2 getRight()        const { return { pos.x + w * 0.5f, pos.y }; }
-	Vector2 getTopLeft()      const { return { pos.x - w * 0.5f, pos.y - h * 0.5f }; }
-	Vector2 getTopRight()     const { return { pos.x + w * 0.5f, pos.y - h * 0.5f }; }
-	Vector2 getBottomLeft()   const { return { pos.x - w * 0.5f, pos.y + h * 0.5f }; }
-	Vector2 getBottomRight()  const { return { pos.x + w * 0.5f, pos.y + h * 0.5f }; }
+	Vector2 getCenter()       const { return {pos.x, pos.y}; }
+	Vector2 getTop()          const { return {pos.x, pos.y - h * 0.5f}; }
+	Vector2 getBottom()       const { return {pos.x, pos.y + h * 0.5f}; }
+	Vector2 getLeft()         const { return {pos.x - w * 0.5f, pos.y}; }
+	Vector2 getRight()        const { return {pos.x + w * 0.5f, pos.y}; }
+	Vector2 getTopLeft()      const { return {pos.x - w * 0.5f, pos.y - h * 0.5f}; }
+	Vector2 getTopRight()     const { return {pos.x + w * 0.5f, pos.y - h * 0.5f}; }
+	Vector2 getBottomLeft()   const { return {pos.x - w * 0.5f, pos.y + h * 0.5f}; }
+	Vector2 getBottomRight()  const { return {pos.x + w * 0.5f, pos.y + h * 0.5f}; }
 
 	//also usefull for rendering
 	Rectangle getAABB()
 	{
-		return { pos.x - w * 0.5f, pos.y - h * 0.5f, w, h };
+		return {pos.x - w * 0.5f, pos.y - h * 0.5f, w, h};
 	}
 
 	bool intersectPoint(Vector2 point, float delta = 0)
@@ -143,15 +144,24 @@ struct Transform2D
 
 		return CheckCollisionRecs(a, b);
 	}
+
 };
+
+struct GameMap;
 
 struct PhysicalEntity
 {
+
 	Transform2D transform;
 	Vector2 lastPosition = {};
 
 	Vector2 velocity = {};
 	Vector2 acceleration = {};
+
+	bool upTouch = 0;
+	bool downTouch = 0;
+	bool leftTouch = 0;
+	bool rightTouch = 0;
 
 	void teleport(Vector2 pos)
 	{
@@ -164,11 +174,12 @@ struct PhysicalEntity
 		velocity += acceleration * deltaTime;
 		transform.pos += velocity * deltaTime;
 
-		// Universal drag (air resisteance / friction)
-		Vector2 dragVector = Vector2{ velocity.x * std::abs(velocity.x),
-			velocity.y * std::abs(velocity.y) };
-		float drag = 0.01f; //tweak this for your needs
+		// Universal drag (air resistance / friction)
+		Vector2 dragVector = Vector2{velocity.x * std::abs(velocity.x),
+			velocity.y * std::abs(velocity.y)};
+		float drag = 0.01f; // tweak this for your needs
 
+		//#include <raymath.h>
 		if (Vector2Length(dragVector) * drag * deltaTime > Vector2Length(velocity))
 		{
 			velocity = {};
@@ -177,6 +188,7 @@ struct PhysicalEntity
 		{
 			velocity -= dragVector * drag * deltaTime;
 		}
+
 		if (Vector2Length(velocity) < 0.01)
 		{
 			velocity = {};
@@ -188,7 +200,7 @@ struct PhysicalEntity
 	//called at the end of the frame
 	void updateFinal()
 	{
-		lastPosition = { transform.pos.x, transform.pos.y };
+		lastPosition = {transform.pos.x, transform.pos.y};
 	}
 
 	void applyGravity()
@@ -196,8 +208,15 @@ struct PhysicalEntity
 		acceleration += {0, 20.0};
 	}
 
-	Vector2& getPosition()
+	Vector2 &getPosition()
 	{
 		return transform.pos;
 	}
+
+	//function to resolve the collisions
+	void resolveConstrains(GameMap &mapData);
+
+	void checkCollisionOnce(Vector2 &pos, GameMap &mapData);
+	Vector2 performCollisionOnOneAxis(GameMap &mapData, Vector2 pos, Vector2 delta);
+
 };

@@ -1,5 +1,5 @@
 #include "gameMap.h"
-#include "platform/asserts.h"
+#include "asserts.h"
 
 void GameMap::create(int w, int h)
 {

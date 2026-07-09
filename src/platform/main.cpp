@@ -4,7 +4,7 @@
 #include <imgui.h>
 #include <rlImGui.h>
 
-#include "gameLayer/gameMain.h"
+#include "gameMain.h"
 
 
 int main(void)

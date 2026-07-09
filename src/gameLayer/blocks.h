@@ -65,4 +65,13 @@ struct Block
 	};
 
 	std::uint16_t type = 0;
+//	std::uint8_t durability = 0;
+
+	void sanitize()
+	{
+		if (type >= BLOCKS_COUNT)
+		{
+			type = 0;
+		}
+	}
 };

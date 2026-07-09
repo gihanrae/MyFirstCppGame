@@ -1,6 +1,8 @@
 #include "worldGenerator.h"
 #include "randomStuff.h"
 #include <FastNoiseSIMD.h>
+#include <structure.h>
+#include <saveMap.h>
 
 
 void generateWorld(GameMap& gameMap, int seed)
@@ -18,7 +20,8 @@ void generateWorld(GameMap& gameMap, int seed)
 	int desertEnd = desertStart + 100 + getRandomInt(rng, 0, 100);
 	if (desertEnd > w) { desertEnd = w; }
 
-
+	Structure treeStructure;
+	loadBlockDataFromFile(treeStructure.mapData, treeStructure.w, treeStructure.h, RESOURCES_PATH "structures/tree.bin");
 
 	std::unique_ptr<FastNoiseSIMD> dirtNoiseGenrator(FastNoiseSIMD::NewFastNoiseSIMD());
 	std::unique_ptr<FastNoiseSIMD> cavesNoiseGenerator(FastNoiseSIMD::NewFastNoiseSIMD());
@@ -301,6 +304,48 @@ void generateWorld(GameMap& gameMap, int seed)
 #pragma endregion
 
 
+#pragma region fill trees
 
+	for (int x = 0; x < w; x++)
+	{
+
+		if (getRandomChance(rng, 0.04))
+		{
+
+			for (int y = 0; y < h; y++)
+			{
+				auto type = gameMap.getBlockUnsafe(x, y).type;
+				if (type == Block::air)
+				{
+					continue;
+				}
+
+				if (type == Block::grassBlock)
+				{
+					//plant tree
+
+					Vector2 spawnPos{ (float)x, (float)y };
+
+					spawnPos.x -= treeStructure.w / 2;
+					spawnPos.y -= treeStructure.h;
+
+					treeStructure.pasteIntoMap(gameMap, spawnPos);
+
+					x += 3; //we don't plant a tree to overlap this one
+
+					break;
+				}
+				else
+				{
+					break;
+				}
+
+
+			}
+
+
+		}
+	}
+#pragma endregion
 
 }

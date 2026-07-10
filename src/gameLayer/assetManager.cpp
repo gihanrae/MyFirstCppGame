@@ -7,5 +7,6 @@ void AssetManager::loadAll()
 	frame = LoadTexture(RESOURCES_PATH "frame.png");
 	player = LoadTexture(RESOURCES_PATH "player.png");
 	slime = LoadTexture(RESOURCES_PATH "slime.png");
+	items = LoadTexture(RESOURCES_PATH "items.png");
 
 }

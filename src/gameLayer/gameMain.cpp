@@ -1,17 +1,17 @@
 #include <raylib.h>
 #include "gameMain.h"
-#include <fstream>
-#include <iostream>
-#include "asserts.h"
-#include "assetManager.h"
-#include "gameMap.h"
-#include "helpers.h"
-#include "worldGenerator.h"
+#include <asserts.h>
+#include <assetManager.h>
+#include <gameMap.h>
+#include <helpers.h>
 #include <raymath.h>
+#include <worldGenerator.h>
 #include <imgui.h>
 #include <structure.h>
+#include <string>
 #include <saveMap.h>
 #include <physics.h>
+#include <iostream>
 #include <entities/slime.h>
 
 
@@ -76,22 +76,27 @@ bool updateGame()
 	if (IsKeyDown(KEY_W)) gameData.player.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
 	if (IsKeyDown(KEY_S)) gameData.player.transform.pos.y += CAMERA_SPEED * GetFrameTime();
 
+	if (IsKeyDown(KEY_SPACE)) gameData.player.jump(10);
+
 #pragma endregion
 
 #pragma region entities
 
-	//gameData.player.applyGravity();
+	gameData.player.applyGravity();
 
 	gameData.player.updateForces(deltaTime);
 
-	gameData.player.checkCollisionOnce(gameData.player.transform.pos, gameData.gameMap);
+	gameData.player.resolveConstrains(gameData.gameMap);
 
-	gameData.camera.target = gameData.player.getPosition();
+	gameData.camera.target = gameData.player.transform.pos;
 
 	gameData.player.updateFinal();
 
-	//slime
-	gameData.slime.update(deltaTime);
+
+	//sline
+	std::ranlux24_base rng(std::random_device{}());
+
+	gameData.slime.update(deltaTime, rng, gameData.player.getPosition());
 
 	gameData.slime.physics.applyGravity();
 

@@ -208,6 +208,14 @@ struct PhysicalEntity
 		acceleration += {0, 20.0};
 	}
 
+	void jump(float force)
+	{
+		if (downTouch)
+		{
+			velocity.y = -force;
+		}
+	}
+
 	Vector2 &getPosition()
 	{
 		return transform.pos;

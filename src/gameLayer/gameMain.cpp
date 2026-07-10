@@ -13,6 +13,7 @@
 #include <physics.h>
 #include <iostream>
 #include <entities/slime.h>
+#include <entityIdHolder.h>
 
 
 struct  GameData
@@ -29,13 +30,24 @@ struct  GameData
 	char saveName[100] = {};
 
 	PhysicalEntity player;
-	Slime slime;
+	EntityHolder entities;
 
 }gameData;
 
 AssetManager assetManager;
 
 bool showImgui = false;
+
+void spawnSlime(Vector2 position)
+{
+	Slime slime;
+
+	slime.physics.teleport(position);
+
+	auto id = gameData.entities.idHolder.getEntityIdAndIncrement();
+
+	gameData.entities.entities[id] = slime;
+}
 
 bool initGame()
 {
@@ -51,7 +63,7 @@ bool initGame()
 	gameData.player.transform.w = 0.9f;
 	gameData.player.transform.h = 1.8f;
 
-	gameData.slime.physics.teleport({ 18,60 });
+	spawnSlime({18, 60});
 
 	return true;
 }
@@ -93,16 +105,21 @@ bool updateGame()
 	gameData.player.updateFinal();
 
 
-	//sline
+	
 	std::ranlux24_base rng(std::random_device{}());
 
-	gameData.slime.update(deltaTime, rng, gameData.player.getPosition());
+	//entities
 
-	gameData.slime.physics.applyGravity();
+	for (auto& e : gameData.entities.entities)
+	{
+		e.second.update(deltaTime, rng, gameData.player.getPosition());
 
-	gameData.slime.physics.updateForces(deltaTime);
-	gameData.slime.physics.resolveConstrains(gameData.gameMap);
-	gameData.slime.physics.updateFinal();
+		e.second.physics.applyGravity();
+
+		e.second.physics.updateForces(deltaTime);
+		e.second.physics.resolveConstrains(gameData.gameMap);
+		e.second.physics.updateFinal();
+	}
 
 #pragma endregion
 
@@ -219,7 +236,10 @@ bool updateGame()
 		DrawRectangleLinesEx(rect, 0.05, {20, 101, 250, 145});
 	}
 
-	gameData.slime.render(assetManager);
+	for (auto& e : gameData.entities.entities)
+	{
+		e.second.render(assetManager);
+	}
 
 	Transform2D playerSprite = gameData.player.transform;
 	playerSprite.w = 1;
@@ -247,6 +267,11 @@ bool updateGame()
 
 		ImGui::SliderFloat("Camera zoom:", &gameData.camera.zoom, 10, 150);
 		ImGui::SliderFloat("Camera speed:", &CAMERA_SPEED, 5, 30);
+
+		if (ImGui::Button("Spawn Slime"))
+		{
+			spawnSlime({18, 60});
+		}
 
 		if (ImGui::Button("Copy"))
 		{

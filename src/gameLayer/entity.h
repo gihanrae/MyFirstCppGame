@@ -8,7 +8,7 @@ struct EntityHolder;
 
 enum EntityType
 {
-	EntityTpe_Player = 0,
+	EntityType_Player = 0,
 	EntityType_Slime,
 	EntityType_DroppedItem,
 };

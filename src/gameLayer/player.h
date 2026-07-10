@@ -2,25 +2,30 @@
 
 #include <physics.h>
 #include <raylib.h>
-#include <random>
 #include <entity.h>
+
 
 struct AssetManager;
 
-struct DroppedItem : public Entity
+
+struct Player : public Entity
 {
-	DroppedItem()
+	Player()
 	{
 		physics.transform.w = 0.8f;
-		physics.transform.h = 0.8f;
+		physics.transform.h = 1.6f;
 	}
 
-	int itemType = 0;
-	int itemCounter = 1;
+	Vector2& getPosition()
+	{
+		return physics.transform.pos;
+	}
 
 	void render(AssetManager& assetManager);
 
+	int getEntityType() { return EntityType_Player; };
+
 	bool update(float deltaTime, EntityUpdateData entityUpdateData);
 
-	int getEntityType() { return EntityType_DroppedItem; }
+
 };

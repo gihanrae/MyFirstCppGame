@@ -46,7 +46,7 @@ void spawnSlime(Vector2 position)
 
 	auto id = gameData.entities.idHolder.getEntityIdAndIncrement();
 
-	gameData.entities.entities[id] = slime;
+	gameData.entities.entities[id] = std::make_unique<Slime>(slime);
 }
 
 bool initGame()
@@ -110,15 +110,21 @@ bool updateGame()
 
 	//entities
 
+	EntityUpdateData updateData
+	{
+		gameData.player.getPosition(),
+		rng
+	};
+
 	for (auto& e : gameData.entities.entities)
 	{
-		e.second.update(deltaTime, rng, gameData.player.getPosition());
+		e.second->update(deltaTime, updateData);
 
-		e.second.physics.applyGravity();
+		e.second->physics.applyGravity();
 
-		e.second.physics.updateForces(deltaTime);
-		e.second.physics.resolveConstrains(gameData.gameMap);
-		e.second.physics.updateFinal();
+		e.second->physics.updateForces(deltaTime);
+		e.second->physics.resolveConstrains(gameData.gameMap);
+		e.second->physics.updateFinal();
 	}
 
 #pragma endregion
@@ -238,7 +244,7 @@ bool updateGame()
 
 	for (auto& e : gameData.entities.entities)
 	{
-		e.second.render(assetManager);
+		e.second->render(assetManager);
 	}
 
 	Transform2D playerSprite = gameData.player.transform;

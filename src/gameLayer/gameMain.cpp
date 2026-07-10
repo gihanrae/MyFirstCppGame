@@ -139,7 +139,7 @@ bool updateGame()
 
 		bool shouldKill = false;
 
-		if (!it->second->update(deltaTime, updateData))
+		if (!it->second->update(deltaTime, updateData) || it->second->life <= 0)
 		{
 			shouldKill = true;
 		}
@@ -282,20 +282,8 @@ bool updateGame()
 		e.second->render(assetManager);
 	}
 
-	Transform2D playerSprite = gameData.player.physics.transform;
-	playerSprite.w = 1;
-	playerSprite.h = 2;
-	//move the sprite so that the bottom of the sprite matches the bottom of the collider
-	playerSprite.pos.y -= (playerSprite.h - gameData.player.physics.transform.h) / 2;
 
-	DrawTexturePro(
-		assetManager.player,
-		{ 0, 0, (float)assetManager.player.width, (float)assetManager.player.height },
-		playerSprite.getAABB(),
-		{ 0, 0 }, //origin
-		0.0f, // rotation
-		WHITE
-	);
+	gameData.player.render(assetManager);
 
 	DrawRectangleLinesEx(gameData.player.physics.transform.getAABB(), 0.1,
 		{ 20, 101, 250, 120 });
@@ -308,6 +296,20 @@ bool updateGame()
 
 		ImGui::SliderFloat("Camera zoom:", &gameData.camera.zoom, 10, 150);
 		ImGui::SliderFloat("Camera speed:", &CAMERA_SPEED, 5, 30);
+
+		if (ImGui::Button("Hurt a slime"))
+		{
+			for (auto& e : gameData.entities.entities)
+			{
+
+				if (e.second->getEntityType() == EntityType_Slime)
+				{
+					e.second->life -= 3;
+					break;
+				}
+
+			}
+		}
 
 		if (ImGui::Button("Spawn Slime"))
 		{

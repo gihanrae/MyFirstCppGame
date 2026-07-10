@@ -14,6 +14,7 @@
 #include <iostream>
 #include <entities/slime.h>
 #include <entityIdHolder.h>
+#include <entities/droppedItem.h>
 
 
 struct  GameData
@@ -47,6 +48,19 @@ void spawnSlime(Vector2 position)
 	auto id = gameData.entities.idHolder.getEntityIdAndIncrement();
 
 	gameData.entities.entities[id] = std::make_unique<Slime>(slime);
+}
+
+void spawnDroppedItem(Vector2 position, int type)
+{
+	DroppedItem droppedItem;
+
+	droppedItem.teleport(position);
+	droppedItem.itemType = type;
+
+	auto id = gameData.entities.idHolder.getEntityIdAndIncrement();
+
+	gameData.entities.entities[id] = (std::make_unique<DroppedItem>(droppedItem));
+
 }
 
 bool initGame()
@@ -110,21 +124,39 @@ bool updateGame()
 
 	//entities
 
-	EntityUpdateData updateData
+	//update all entities
+	for (auto it = gameData.entities.entities.begin(); it != gameData.entities.entities.end();)
 	{
-		gameData.player.getPosition(),
-		rng
-	};
+		EntityUpdateData updateData
+		{
+			gameData.player.getPosition(),
+			rng,
+			gameData.entities,
+			it->first
+		};
 
-	for (auto& e : gameData.entities.entities)
-	{
-		e.second->update(deltaTime, updateData);
+		bool shouldKill = false;
 
-		e.second->physics.applyGravity();
+		if (!it->second->update(deltaTime, updateData))
+		{
+			shouldKill = true;
+		}
 
-		e.second->physics.updateForces(deltaTime);
-		e.second->physics.resolveConstrains(gameData.gameMap);
-		e.second->physics.updateFinal();
+		if (shouldKill)
+		{
+			// erase returns the next valid iterator
+			it = gameData.entities.entities.erase(it);
+		}
+		else
+		{
+			//physics
+			it->second->physics.applyGravity();
+			it->second->physics.updateForces(deltaTime);
+			it->second->physics.resolveConstrains(gameData.gameMap);
+			it->second->physics.updateFinal();
+
+			++it;
+		}
 	}
 
 #pragma endregion
@@ -163,6 +195,10 @@ bool updateGame()
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 			if (b)
 			{
+				if (b->type)
+				{
+					spawnDroppedItem({(float)blockX + 0.5f, (float)blockY + 0.5f}, b->type);
+				}
 				*b = {};
 			}
 		}

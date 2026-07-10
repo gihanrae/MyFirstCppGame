@@ -12,6 +12,7 @@
 #include <structure.h>
 #include <saveMap.h>
 #include <physics.h>
+#include <entities/slime.h>
 
 
 struct  GameData
@@ -28,6 +29,7 @@ struct  GameData
 	char saveName[100] = {};
 
 	PhysicalEntity player;
+	Slime slime;
 
 }gameData;
 
@@ -48,6 +50,8 @@ bool initGame()
 	gameData.player.teleport({ 20, 60 });
 	gameData.player.transform.w = 0.9f;
 	gameData.player.transform.h = 1.8f;
+
+	gameData.slime.physics.teleport({ 18,60 });
 
 	return true;
 }
@@ -76,7 +80,7 @@ bool updateGame()
 
 #pragma region entities
 
-	gameData.player.applyGravity();
+	//gameData.player.applyGravity();
 
 	gameData.player.updateForces(deltaTime);
 
@@ -85,6 +89,15 @@ bool updateGame()
 	gameData.camera.target = gameData.player.getPosition();
 
 	gameData.player.updateFinal();
+
+	//slime
+	gameData.slime.update(deltaTime);
+
+	gameData.slime.physics.applyGravity();
+
+	gameData.slime.physics.updateForces(deltaTime);
+	gameData.slime.physics.resolveConstrains(gameData.gameMap);
+	gameData.slime.physics.updateFinal();
 
 #pragma endregion
 
@@ -200,6 +213,8 @@ bool updateGame()
 
 		DrawRectangleLinesEx(rect, 0.05, {20, 101, 250, 145});
 	}
+
+	gameData.slime.render(assetManager);
 
 	Transform2D playerSprite = gameData.player.transform;
 	playerSprite.w = 1;

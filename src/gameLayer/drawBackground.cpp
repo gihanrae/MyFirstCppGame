@@ -10,11 +10,18 @@ void DrawBackground::draw(float deltaTime, AssetManager& assetManager,
 {
 
 
-	auto drawOneBackground = [&](float parallax, float opacity)
+	auto drawOneBackground = [&](int type, float parallax, float opacity)
 		{
 
 			Texture bg = assetManager.forestBG;
 
+			switch (type)
+			{
+			case forest: bg = assetManager.forestBG; break;
+			case desert: bg = assetManager.desertBG; break;
+			case snow: bg = assetManager.snowBG; break;
+			case cave: bg = assetManager.caveBG; break;
+			}
 
 
 			int screenW = GetScreenWidth();
@@ -75,7 +82,36 @@ void DrawBackground::draw(float deltaTime, AssetManager& assetManager,
 		};
 
 
-	drawOneBackground(0.3, 1);
+	drawOneBackground(currentBackgroundType, 0.3, 1);
+
+	//draw the transition on top
+	transitionTime -= deltaTime;
+	if (transitionTime > 0)
+	{
+		float opacity = transitionTime;
+		if (opacity > 1) { opacity = 1; }
+		drawOneBackground(currentTransitionType, 0.3, opacity);
+	}
 
 
+}
+
+void DrawBackground::setBackground(int background)
+{
+	if (background != currentBackgroundType)
+	{
+
+		if (transitionTime <= 0)
+		{
+			transitionTime = 1;
+			currentTransitionType = currentBackgroundType;
+			currentBackgroundType = background;
+		}
+		else
+		{
+			//we wait for the previous transition to finish first
+		}
+
+
+	}
 }

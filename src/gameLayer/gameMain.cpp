@@ -261,7 +261,29 @@ bool updateGame()
 
 #pragma region draw world
 
-	gameData.background.draw(deltaTime, assetManager, gameData.camera, { (float)gameData.gameMap.w, (float)gameData.gameMap.h });
+	//background
+	{
+
+		int backgroundType = DrawBackground::forest;
+
+		if (gameData.player.getPosition().x > gameData.gameMap.desertStart &&
+			gameData.player.getPosition().x < gameData.gameMap.desertEnd
+			)
+		{
+			backgroundType = DrawBackground::desert;
+		}
+
+		if (gameData.player.getPosition().y > 130)
+		{
+			backgroundType = DrawBackground::cave;
+		}
+
+		gameData.background.setBackground(backgroundType);
+
+		gameData.background.draw(deltaTime, assetManager, gameData.camera,
+			{ (float)gameData.gameMap.w, (float)gameData.gameMap.h });
+
+	}
 
 	BeginMode2D(gameData.camera);
 

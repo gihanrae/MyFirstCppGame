@@ -389,10 +389,27 @@ bool updateGame()
 		ImGui::SliderFloat("master volume", &getSettings().masterVolume, 0, 1);
 		ImGui::SliderFloat("sound volume", &getSettings().soundsVolume, 0, 1);
 
+		ImGui::Separator();
+
+		ImGui::SliderFloat("master volume", &getSettings().masterVolume, 0, 1);
+		ImGui::SliderFloat("sound volume", &getSettings().soundsVolume, 0, 1);
+		ImGui::SliderFloat("music volume", &getSettings().musicVolume, 0, 1);
+
 		if (ImGui::Button("Play sound"))
 		{
 			Audio::playSound(Audio::placeBlock);
 		}
+
+		if (ImGui::Button("Play music forest"))
+		{
+			Audio::playMusic(Audio::musicForest);
+		}
+
+		if (ImGui::Button("Play music desert"))
+		{
+			Audio::playMusic(Audio::musicDesert);
+		}
+
 
 		ImGui::Separator();
 
@@ -421,6 +438,10 @@ bool updateGame()
 				ImGui::SameLine();
 			}
 		}
+
+
+
+		ImGui::Separator();
 
 		ImGui::End();
 	}

@@ -10,5 +10,10 @@ struct AssetManager
 	Texture2D slime = {};
 	Texture2D items = {};
 
+	Texture2D forestBG = {};
+	Texture2D desertBG = {};
+	Texture2D snowBG = {};
+	Texture2D caveBG = {};
+
 	void loadAll();
 };

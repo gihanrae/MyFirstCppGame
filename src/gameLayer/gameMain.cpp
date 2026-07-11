@@ -18,12 +18,14 @@
 #include <player.h>
 #include <audio.h>
 #include <settings.h>
+#include <drawBackground.h>
 
 
 struct  GameData
 {
 	GameMap gameMap;
 	Camera2D camera;
+	DrawBackground background;
 
 	int creativeSelectedBlock = Block::dirt;
 
@@ -259,6 +261,10 @@ bool updateGame()
 
 #pragma region draw world
 
+	gameData.background.draw(deltaTime, assetManager, gameData.camera, { (float)gameData.gameMap.w, (float)gameData.gameMap.h });
+
+	BeginMode2D(gameData.camera);
+
 	Vector2 topLeftView = GetScreenToWorld2D({ 0, 0 }, gameData.camera);
 	Vector2 bottomRightView = GetScreenToWorld2D({(float)GetScreenWidth(), (float)GetScreenHeight()}, gameData.camera);
 
@@ -269,10 +275,9 @@ bool updateGame()
 
 	startXView = Clamp(startXView, 0, gameData.gameMap.w - 1);
 	endXView = Clamp(endXView, 0, gameData.gameMap.w - 1);
+
 	startYView = Clamp(startYView, 0, gameData.gameMap.h - 1);
 	endYView = Clamp(endYView, 0, gameData.gameMap.h - 1);
-
-	BeginMode2D(gameData.camera);
 
 	for (int y = startYView; y < endYView; y++)
 		for (int x = startXView; x < endXView; x++)

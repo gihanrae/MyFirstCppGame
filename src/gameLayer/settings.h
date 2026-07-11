@@ -18,8 +18,23 @@ struct Settings
 
 	}
 
+	bool operator==(const Settings& other) const
+	{
+		return musicVolume == other.musicVolume && masterVolume == other.masterVolume && soundsVolume == other.soundsVolume;
+	}
+
+	bool operator!=(const Settings& other) const
+	{
+		return !(*this == other);
+	}
 
 };
 
 Settings& getSettings();
+
+void saveSettings();
+
+void loadSettings();
+
+void updateSettings();
 

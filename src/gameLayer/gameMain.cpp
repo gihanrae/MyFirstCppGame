@@ -70,6 +70,7 @@ bool initGame()
 {
 	Audio::init();
 	assetManager.loadAll();
+	loadSettings();
 
 	generateWorld(gameData.gameMap);
 
@@ -89,6 +90,8 @@ bool initGame()
 bool updateGame()
 {
 	Audio::update();
+	updateSettings();
+
 	float deltaTime{ GetFrameTime() };
 	if (deltaTime > 1.f / 5) { deltaTime = 1 / 5.f; }
 
@@ -385,15 +388,21 @@ bool updateGame()
 
 		ImGui::Separator();
 
-
-		ImGui::SliderFloat("master volume", &getSettings().masterVolume, 0, 1);
-		ImGui::SliderFloat("sound volume", &getSettings().soundsVolume, 0, 1);
-
-		ImGui::Separator();
-
 		ImGui::SliderFloat("master volume", &getSettings().masterVolume, 0, 1);
 		ImGui::SliderFloat("sound volume", &getSettings().soundsVolume, 0, 1);
 		ImGui::SliderFloat("music volume", &getSettings().musicVolume, 0, 1);
+
+		if (ImGui::Button("Save settings"))
+		{
+			saveSettings();
+		}
+
+		if (ImGui::Button("Load settings"))
+		{
+			loadSettings();
+		}
+
+		ImGui::Separator();
 
 		if (ImGui::Button("Play sound"))
 		{

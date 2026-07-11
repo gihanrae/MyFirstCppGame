@@ -16,6 +16,8 @@
 #include <entityIdHolder.h>
 #include <entities/droppedItem.h>
 #include <player.h>
+#include <audio.h>
+#include <settings.h>
 
 
 struct  GameData
@@ -66,6 +68,7 @@ void spawnDroppedItem(Vector2 position, int type)
 
 bool initGame()
 {
+	Audio::init();
 	assetManager.loadAll();
 
 	generateWorld(gameData.gameMap);
@@ -85,6 +88,7 @@ bool initGame()
 
 bool updateGame()
 {
+	Audio::update();
 	float deltaTime{ GetFrameTime() };
 	if (deltaTime > 1.f / 5) { deltaTime = 1 / 5.f; }
 
@@ -377,6 +381,17 @@ bool updateGame()
 			path += ".bin";
 
 			loadBlockDataFromFile(gameData.copyStructure.mapData, gameData.copyStructure.w, gameData.copyStructure.h, path.c_str());
+		}
+
+		ImGui::Separator();
+
+
+		ImGui::SliderFloat("master volume", &getSettings().masterVolume, 0, 1);
+		ImGui::SliderFloat("sound volume", &getSettings().soundsVolume, 0, 1);
+
+		if (ImGui::Button("Play sound"))
+		{
+			Audio::playSound(Audio::placeBlock);
 		}
 
 		ImGui::Separator();

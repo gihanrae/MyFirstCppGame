@@ -19,6 +19,7 @@
 #include <audio.h>
 #include <settings.h>
 #include <drawBackground.h>
+#include <ui.h>
 
 
 struct  GameData
@@ -408,6 +409,52 @@ bool updateGame()
 		{ 20, 101, 250, 120 });
 
 	EndMode2D();
+
+#pragma endregion
+
+#pragma region ui
+	{
+
+		float w = GetScreenWidth();
+		float h = GetScreenHeight();
+
+		Rectangle hearthRectangle;
+
+		hearthRectangle.height = h * 0.05;
+		hearthRectangle.width = hearthRectangle.height * 5;
+
+		hearthRectangle = placeRectangleTopRightCorner(hearthRectangle, w);
+
+		//test the drawing area
+		//DrawRectangle(hearthRectangle.x, hearthRectangle.y, hearthRectangle.width, hearthRectangle.height, RED);
+
+
+		for (int i = 0; i < 5; i++)
+		{
+
+			Rectangle oneHearthRectangle = hearthRectangle;
+			oneHearthRectangle.width = oneHearthRectangle.height;
+			oneHearthRectangle.x += oneHearthRectangle.width * i;
+
+			//shrink hearths
+			oneHearthRectangle = shrinkRectanglePercentage(oneHearthRectangle, 0.1, 0.1);
+
+			DrawTexturePro(
+				assetManager.hearts,
+				getTextureAtlas(0, 0, assetManager.hearts.width / 3, assetManager.hearts.height), //source
+				oneHearthRectangle, //dest
+				{ 0, 0 },// origin (top-left corner)
+				0.0f, // rotation
+				WHITE // tint
+			);
+
+		}
+
+	}
+
+#pragma endregion
+
+#pragma region imgui
 
 	if (showImgui)
 	{

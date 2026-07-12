@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <entity.h>
 #include <entityAnimation.h>
+#include <items.h>
 
 
 struct AssetManager;
@@ -35,6 +36,10 @@ struct Player : public Entity
 
 	float getMaxLife() { return 10; }
 
-
+	int armourHead = Item::partyHat;
+	int armourChest = Item::goldChestPlate;
+	int armourLegs = Item::iceBoots;
+	int armourItem = Item::goldSword;
+	int heldItem = Item::goldSword;
 
 };

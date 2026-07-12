@@ -124,7 +124,7 @@ bool updateGame()
 			moving = true;
 			gameData.player.animations.movingLeft = false;
 		}
-		if (!creative)
+		if (creative)
 		{
 			if (IsKeyDown(KEY_W)) { gameData.player.physics.transform.pos.y -= CAMERA_SPEED * GetFrameTime(); moving = true; }
 			if (IsKeyDown(KEY_S)) { gameData.player.physics.transform.pos.y += CAMERA_SPEED * GetFrameTime(); moving = true; }

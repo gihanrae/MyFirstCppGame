@@ -5,7 +5,7 @@ Rectangle getTextureAtlas(int x, int y, int cellSizePixelsX, int cellSizePixelsY
 	float sizeX = cellSizePixelsX;
 	if (flipX) { sizeX *= -1; }
 
-	return Rectangle{(float)x * cellSizePixelsX, (float)y * cellSizePixelsY, (float)sizeX, (float)cellSizePixelsY};
+	return shrinkUV( Rectangle{(float)x * cellSizePixelsX, (float)y * cellSizePixelsY, (float)sizeX, (float)cellSizePixelsY} );
 }
 
 Rectangle getRectangleForEntity(Transform2D transform, float textureW, float textureH)
@@ -18,4 +18,21 @@ Rectangle getRectangleForEntity(Transform2D transform, float textureW, float tex
 	rezult.pos.y -= (rezult.h - transform.h) / 2;
 
 	return rezult.getAABB();
+}
+
+Rectangle flipTextureAtlasX(Rectangle r)
+{
+	r.width = -r.width;
+	return r;
+}
+
+Rectangle shrinkUV(Rectangle in)
+{
+	float shrink = 0.1;
+	in.width -= shrink;
+	in.height -= shrink;
+	in.x += shrink / 2.f;
+	in.y += shrink / 2.f;
+
+	return in;
 }

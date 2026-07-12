@@ -49,9 +49,51 @@ struct Entity
 
 	virtual int getEntityType() = 0;
 
+	virtual void setColliderSize() = 0;
+
 	virtual float getMaxLife() = 0;
 
-	virtual Json formatToJson() { return {}; }
+	virtual Json formatToJson() = 0;
 
-	virtual bool loadFromJson(Json& j) { return true;  }
+	virtual bool loadFromJson(Json& j) = 0;
+
+	void addCommonEntityStuffToJson(Json& json)
+	{
+		json["physics"] = physics.formatToJson();
+		json["life"] = life;
+
+		json["entityType"] = getEntityType();
+	}
+
+	//will fail if there is no position
+	bool loadCommonEntityStuffFromJson(Json& json)
+	{
+
+		if (json.contains("physics"))
+		{
+			auto j = json["physics"];
+
+			if (j.is_object())
+			{
+				if (!physics.loadFromJson(j))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+		if (json["life"].is_number())
+		{
+			life = json["life"];
+		}
+
+	}
 };

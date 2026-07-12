@@ -14,11 +14,9 @@ struct Player : public Entity
 {
 	Player()
 	{
-		physics.transform.w = 0.8f;
-		physics.transform.h = 1.6f;
+		setColliderSize();
 
 		life = getMaxLife();
-
 	}
 
 	EntityAnimation animations;
@@ -35,6 +33,17 @@ struct Player : public Entity
 	bool update(float deltaTime, EntityUpdateData entityUpdateData);
 
 	float getMaxLife() { return 10; }
+
+
+	Json formatToJson();
+
+	bool loadFromJson(Json& j);
+
+	void setColliderSize()
+	{
+		physics.transform.w = 0.8f;
+		physics.transform.h = 1.6f;
+	}
 
 	int armourHead = Item::partyHat;
 	int armourChest = Item::goldChestPlate;

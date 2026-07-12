@@ -14,6 +14,8 @@ void AssetManager::loadAll()
 	desertBG = LoadTexture(RESOURCES_PATH "desertBG.png");
 	snowBG = LoadTexture(RESOURCES_PATH "snowBG.png");
 	caveBG = LoadTexture(RESOURCES_PATH "caveBG.png");
+	hearts = LoadTexture(RESOURCES_PATH "hearts.png");
+
 
 
 	//optional blur the background

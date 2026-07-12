@@ -17,6 +17,7 @@ struct AssetManager
 	Texture2D desertBG = {};
 	Texture2D snowBG = {};
 	Texture2D caveBG = {};
+	Texture2D hearts = {};
 
 	std::unordered_map <int, Texture2D> frontArmour;
 	std::unordered_map <int, Texture2D> backArmour;

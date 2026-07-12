@@ -146,11 +146,11 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities,
 	std::error_code errorCode;
 	std::filesystem::create_directory(RESOURCES_PATH "../saves/", errorCode);
 
-	saveBlockDataToFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin");
+	saveBlockDataToFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin.tmp");
 
 	//id holder
 	{
-		std::ofstream f(RESOURCES_PATH "../saves/idHolder.txt");
+		std::ofstream f(RESOURCES_PATH "../saves/idHolder.txt.tmp");
 		f << entities.idHolder.idCounter;
 		f.close();
 	}
@@ -159,7 +159,7 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities,
 	{
 		Json j = player.formatToJson();
 
-		std::ofstream f(RESOURCES_PATH "../saves/player.txt");
+		std::ofstream f(RESOURCES_PATH "../saves/player.txt.tmp");
 		f << j.dump(2);
 		f.close();
 	}
@@ -173,12 +173,15 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities,
 			j[std::to_string(e.first)] = e.second->formatToJson();
 		}
 
-		std::ofstream f(RESOURCES_PATH "../saves/entities.txt");
+		std::ofstream f(RESOURCES_PATH "../saves/entities.txt.tmp");
 		f << j.dump(2);
 		f.close();
 	}
 
-
+	std::filesystem::rename(RESOURCES_PATH "../saves/map.bin.tmp", RESOURCES_PATH "../saves/map.bin", errorCode);
+	std::filesystem::rename(RESOURCES_PATH "../saves/idHolder.txt.tmp", RESOURCES_PATH "../saves/idHolder.txt", errorCode);
+	std::filesystem::rename(RESOURCES_PATH "../saves/player.txt.tmp", RESOURCES_PATH "../saves/player.txt", errorCode);
+	std::filesystem::rename(RESOURCES_PATH "../saves/entities.txt.tmp", RESOURCES_PATH "../saves/entities.txt", errorCode);
 
 
 }
@@ -205,12 +208,71 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities,
 		f.close();
 	}
 
-	//player
-	//todo
-
 	//entities
-	//todo
+	{
+		std::ifstream f(RESOURCES_PATH "../saves/entities.txt");
+		if (!f.is_open())
+			return false;
 
+		Json j;
+		j = Json::parse(f, nullptr, /*allow_exceptions=*/false);
+
+		for (auto it = j.begin(); it != j.end(); ++it)
+		{
+			const std::string& keyStr = it.key();
+			bool isNumeric = !keyStr.empty() && std::all_of(keyStr.begin(), keyStr.end(), ::isdigit);
+
+			if (!isNumeric)
+				continue; // skip non-numeric keys
+
+			std::uint64_t id = 0;
+
+			for (auto c : keyStr)
+			{
+				id *= 10;
+				id += c - '0';
+			}
+
+			Json& entityJson = it.value();
+
+			int entityType = 0;
+
+			if (entityJson["entityType"].is_number())
+			{
+				entityType = entityJson["entityType"];
+
+				switch (entityType)
+				{
+				case EntityType_Slime:
+				{
+					Slime slime;
+					if (slime.loadFromJson(entityJson))
+					{
+						entities.entities[id] = std::make_unique<Slime>(slime);
+					}
+
+					break;
+				}
+
+				case EntityType_DroppedItem:
+				{
+					DroppedItem item;
+					if (item.loadFromJson(entityJson))
+					{
+						entities.entities[id] = std::make_unique<DroppedItem>(item);
+					}
+
+					break;
+				}
+
+				}
+
+
+			}
+
+
+		}
+	}
 
 
 	return true;

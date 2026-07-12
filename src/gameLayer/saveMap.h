@@ -8,4 +8,10 @@ bool saveBlockDataToFile(const std::vector<Block> &blocks, int w, int h, const c
 
 bool loadBlockDataFromFile(std::vector<Block> &blocks, int &w, int &h, const char *fileName);
 
+struct GameMap;
+struct Player;
+struct EntityHolder;
 
+void saveWorld(GameMap& gamemap, EntityHolder& entities, Player& player);
+
+bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player);

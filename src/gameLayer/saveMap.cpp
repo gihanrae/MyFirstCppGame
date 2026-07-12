@@ -1,5 +1,11 @@
 #include "saveMap.h"
 #include <asserts.h>
+#include <nlohmann/json.hpp>
+#include <gameMap.h>
+#include <entityIdHolder.h>
+#include <player.h>
+#include <entities/slime.h>
+#include <entities/droppedItem.h>
 
 
 struct BlockSaveRepresentation1
@@ -129,4 +135,83 @@ bool loadBlockDataFromFile(std::vector<Block>& blocks, int& w, int& h, const cha
 	f.close();
 	return true;
 
+}
+
+using Json = nlohmann::json;
+
+void saveWorld(GameMap& gameMap, EntityHolder& entities,
+	Player& player)
+{
+
+	std::error_code errorCode;
+	std::filesystem::create_directory(RESOURCES_PATH "../saves/", errorCode);
+
+	saveBlockDataToFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin");
+
+	//id holder
+	{
+		std::ofstream f(RESOURCES_PATH "../saves/idHolder.txt");
+		f << entities.idHolder.idCounter;
+		f.close();
+	}
+
+	//player
+	{
+		Json j = player.formatToJson();
+
+		std::ofstream f(RESOURCES_PATH "../saves/player.txt");
+		f << j.dump(2);
+		f.close();
+	}
+
+	//entities
+	{
+		Json j;
+
+		for (auto& e : entities.entities)
+		{
+			j[std::to_string(e.first)] = e.second->formatToJson();
+		}
+
+		std::ofstream f(RESOURCES_PATH "../saves/entities.txt");
+		f << j.dump(2);
+		f.close();
+	}
+
+
+
+
+}
+
+bool loadWorld(GameMap& gameMap, EntityHolder& entities,
+	Player& player)
+{
+	gameMap = {};
+	entities.entities.clear();
+	player = {};
+	entities.idHolder = {};
+
+	if (!loadBlockDataFromFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin"))
+	{
+		return false;
+	}
+
+	//id holder
+	{
+		std::ifstream f(RESOURCES_PATH "../saves/idHolder.txt");
+
+		if (!f.is_open()) { return false; }
+		f >> entities.idHolder.idCounter;
+		f.close();
+	}
+
+	//player
+	//todo
+
+	//entities
+	//todo
+
+
+
+	return true;
 }

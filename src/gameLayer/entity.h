@@ -2,9 +2,12 @@
 #include <physics.h>
 #include <unordered_map>
 #include <random>
+#include <nlohmann/json.hpp>
 
 struct AssetManager;
 struct EntityHolder;
+
+using Json = nlohmann::json;
 
 enum EntityType
 {
@@ -47,4 +50,8 @@ struct Entity
 	virtual int getEntityType() = 0;
 
 	virtual float getMaxLife() = 0;
+
+	virtual Json formatToJson() { return {}; }
+
+	virtual bool loadFromJson(Json& j) { return true;  }
 };

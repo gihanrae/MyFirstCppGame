@@ -494,6 +494,22 @@ bool updateGame()
 			Audio::playMusic(Audio::musicDesert);
 		}
 
+		ImGui::Separator();
+
+		if (ImGui::Button("Save World"))
+		{
+			saveWorld(gameData.gameMap,
+				gameData.entities, gameData.player);
+		}
+
+		if (ImGui::Button("Load World"))
+		{
+			if (!loadWorld(gameData.gameMap,
+				gameData.entities, gameData.player))
+			{
+				return false;
+			}
+		}
 
 		ImGui::Separator();
 

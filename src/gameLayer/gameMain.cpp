@@ -23,9 +23,10 @@
 #include <gameplay.h>
 
 AssetManager assetManager;
-
 Gameplay gameplay;
-
+UIEngine mainMenuButtons;
+DrawBackground backgroundForMainMenu;
+bool gameplayRunning = false;
 
 
 bool initGame()
@@ -42,9 +43,49 @@ bool initGame()
 
 bool updateGame()
 {
-	return gameplay.update(assetManager);
+	Audio::update();
+	updateSettings();
 
-	//return true;
+	ClearBackground({ 0, 0, 0, 255 });
+
+	if (!gameplayRunning)
+	{
+
+		//you can animate the background if you want by moving the camera and changing it from time to time
+		Camera2D c = {};
+		c.offset = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+		c.target = Vector2{ 200, 500 };
+		c.zoom = 20;
+		backgroundForMainMenu.draw(GetFrameTime(), assetManager, c, { 1000, 1000 });
+
+
+		mainMenuButtons.addTitle("Adventures Time");
+
+		if (mainMenuButtons.addButton("START GAME"))
+		{
+			gameplayRunning = true;
+			gameplay = {}; //make sure we reset the gameplay
+			gameplay.init();
+
+		}
+
+		mainMenuButtons.addButton("SETTINGS");
+
+		if (mainMenuButtons.addButton("EXIT"))
+		{
+			return false;
+		}
+
+		mainMenuButtons.updateAndRender();
+
+		return true;
+	}
+	else
+	{
+		return gameplay.update(assetManager);
+	}
+
+	return true;
 }
 
 void closeGame()

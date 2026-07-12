@@ -65,8 +65,7 @@ bool Gameplay::init()
 
 bool Gameplay::update(AssetManager& assetManager)
 {
-	Audio::update();
-	updateSettings();
+
 
 	float deltaTime = GetFrameTime();
 	if (deltaTime > 1.f / 5) { deltaTime = 1 / 5.f; }

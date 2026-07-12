@@ -39,6 +39,8 @@ struct  GameData
 	Player player;
 	EntityHolder entities;
 
+	bool insideInventory = false;
+
 }gameData;
 
 AssetManager assetManager;
@@ -305,6 +307,11 @@ bool updateGame()
 				b->type = gameData.creativeSelectedBlock;
 			}
 		}
+
+		if (IsKeyPressed(KEY_TAB))
+		{
+			gameData.insideInventory = !gameData.insideInventory;
+		}
 	}
 
 #pragma region draw world
@@ -450,6 +457,62 @@ bool updateGame()
 
 		}
 
+		if (gameData.insideInventory)
+		{
+
+			Rectangle inventoryRectangle;
+
+			inventoryRectangle.height = h * 0.30;
+			inventoryRectangle.width = inventoryRectangle.height * 3;
+
+			//don't let the inventory become bigger than the screen width
+			float maxWidth = w * 0.9;
+			if (inventoryRectangle.width > maxWidth)
+			{
+				float scaleFactor = maxWidth / inventoryRectangle.width;
+				inventoryRectangle.height *= scaleFactor;
+				inventoryRectangle.width *= scaleFactor;
+			}
+
+			inventoryRectangle = placeRectangleTopLeftCorner(inventoryRectangle, w);
+
+			inventoryRectangle.x += w * 0.01;
+			inventoryRectangle.y += h * 0.01;
+
+			DrawRectangle(inventoryRectangle.x, inventoryRectangle.y, inventoryRectangle.width, inventoryRectangle.height,
+				{ 100, 100, 100, 100 });
+
+			inventoryRectangle = shrinkRectanglePercentage(inventoryRectangle, 0.01, 0.01);
+
+			Rectangle oneCellRectangle;
+			oneCellRectangle.height = inventoryRectangle.height / 3;
+			oneCellRectangle.width = oneCellRectangle.height;
+			oneCellRectangle.x = inventoryRectangle.x;
+			oneCellRectangle.y = inventoryRectangle.y;
+
+			for (int i = 0; i < 9; i++)
+				for (int j = 0; j < 3; j++)
+				{
+
+					Rectangle r = oneCellRectangle;
+					r.x += i * oneCellRectangle.width;
+					r.y += j * oneCellRectangle.height;
+
+					r = shrinkRectanglePercentage(r, 0.1, 0.1);
+
+					DrawTexturePro(
+						assetManager.frame,
+						{ 0,0,(float)assetManager.frame.width, (float)assetManager.frame.height }, //source
+						r, //dest
+						{ 0, 0 },// origin (top-left corner)
+						0.0f, // rotation
+						{ 180,180,200,240 } // tint
+					);
+
+				}
+
+
+		}
 	}
 
 #pragma endregion

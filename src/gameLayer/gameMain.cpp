@@ -71,6 +71,21 @@ void spawnDroppedItem(Vector2 position, int type)
 
 }
 
+Rectangle getInventoryRectangle(float w, float h)
+{
+	Rectangle inventoryRectangle;
+
+	inventoryRectangle.height = h * 0.30;
+	inventoryRectangle.width = inventoryRectangle.height * 3;
+
+	inventoryRectangle = placeRectangleTopLeftCorner(inventoryRectangle, w);
+
+	inventoryRectangle.x += w * 0.01;
+	inventoryRectangle.y += h * 0.01;
+	return inventoryRectangle;
+}
+
+
 bool initGame()
 {
 	Audio::init();
@@ -257,6 +272,16 @@ bool updateGame()
 
 #pragma endregion
 
+	bool insideInventoryMenu = 0;
+	Rectangle inventoryRectangle = getInventoryRectangle(GetScreenWidth(), GetScreenHeight());
+
+	if (gameData.insideInventory &&
+		CheckCollisionPointRec(GetMousePosition(), inventoryRectangle))
+	{
+		insideInventoryMenu = true;
+	}
+
+
 	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
 	int blockX = (int)floor(worldPos.x);
 	int blockY = (int)floor(worldPos.y);
@@ -286,6 +311,7 @@ bool updateGame()
 
 	if (!showImgui)
 	{
+		if (!insideInventoryMenu)
 		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 		{
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
@@ -299,6 +325,7 @@ bool updateGame()
 			}
 		}
 
+		if (!insideInventoryMenu)
 		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 		{
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
@@ -381,14 +408,18 @@ bool updateGame()
 		}
 
 	//draw selected block
-	DrawTexturePro(
-		assetManager.frame,
-		{0,0, (float)assetManager.frame.width, (float)assetManager.frame.height},
-		{(float)blockX, (float)blockY, 1, 1}, // dest
-		{0, 0},
-		0.0f,
-		WHITE
-	);
+	if (!insideInventoryMenu)
+	{
+		DrawTexturePro(
+			assetManager.frame,
+			{ 0,0, (float)assetManager.frame.width, (float)assetManager.frame.height },
+			{ (float)blockX, (float)blockY, 1, 1 }, // dest
+			{ 0, 0 },
+			0.0f,
+			WHITE
+		);
+	}
+
 
 	if (showImgui)
 	{
@@ -460,24 +491,7 @@ bool updateGame()
 		if (gameData.insideInventory)
 		{
 
-			Rectangle inventoryRectangle;
-
-			inventoryRectangle.height = h * 0.30;
-			inventoryRectangle.width = inventoryRectangle.height * 3;
-
-			//don't let the inventory become bigger than the screen width
-			float maxWidth = w * 0.9;
-			if (inventoryRectangle.width > maxWidth)
-			{
-				float scaleFactor = maxWidth / inventoryRectangle.width;
-				inventoryRectangle.height *= scaleFactor;
-				inventoryRectangle.width *= scaleFactor;
-			}
-
-			inventoryRectangle = placeRectangleTopLeftCorner(inventoryRectangle, w);
-
-			inventoryRectangle.x += w * 0.01;
-			inventoryRectangle.y += h * 0.01;
+			Rectangle inventoryRectangle = getInventoryRectangle(w, h);
 
 			DrawRectangle(inventoryRectangle.x, inventoryRectangle.y, inventoryRectangle.width, inventoryRectangle.height,
 				{ 100, 100, 100, 100 });
@@ -500,14 +514,28 @@ bool updateGame()
 
 					r = shrinkRectanglePercentage(r, 0.1, 0.1);
 
-					DrawTexturePro(
-						assetManager.frame,
-						{ 0,0,(float)assetManager.frame.width, (float)assetManager.frame.height }, //source
-						r, //dest
-						{ 0, 0 },// origin (top-left corner)
-						0.0f, // rotation
-						{ 180,180,200,240 } // tint
-					);
+					if (CheckCollisionPointRec(GetMousePosition(), r))
+					{
+						DrawTexturePro(
+							assetManager.frame,
+							{ 0,0,(float)assetManager.frame.width, (float)assetManager.frame.height }, //source
+							r, //dest
+							{ 0, 0 },// origin (top-left corner)
+							0.0f, // rotation
+							{ 220,250,220,250 } // tint
+						);
+					}
+					else
+					{
+						DrawTexturePro(
+							assetManager.frame,
+							{ 0,0,(float)assetManager.frame.width, (float)assetManager.frame.height }, //source
+							r, //dest
+							{ 0, 0 },// origin (top-left corner)
+							0.0f, // rotation
+							{ 180,180,200,240 } // tint
+						);
+					}
 
 				}
 

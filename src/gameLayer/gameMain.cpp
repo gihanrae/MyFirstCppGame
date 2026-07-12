@@ -106,13 +106,60 @@ bool updateGame()
 #pragma region camera movement
 
 	static float CAMERA_SPEED = 10;
+	static bool creative = false;
 
-	if (IsKeyDown(KEY_A)) gameData.player.physics.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_D)) gameData.player.physics.transform.pos.x += CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_W)) gameData.player.physics.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_S)) gameData.player.physics.transform.pos.y += CAMERA_SPEED * GetFrameTime();
+	{
+		bool moving = 0;
+		bool falling = 0;
 
-	if (IsKeyDown(KEY_SPACE)) gameData.player.physics.jump(10);
+		if (IsKeyDown(KEY_A))
+		{
+			gameData.player.physics.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
+			moving = true;
+			gameData.player.animations.movingLeft = true;
+		}
+		if (IsKeyDown(KEY_D))
+		{
+			gameData.player.physics.transform.pos.x += CAMERA_SPEED * GetFrameTime();
+			moving = true;
+			gameData.player.animations.movingLeft = false;
+		}
+		if (!creative)
+		{
+			if (IsKeyDown(KEY_W)) { gameData.player.physics.transform.pos.y -= CAMERA_SPEED * GetFrameTime(); moving = true; }
+			if (IsKeyDown(KEY_S)) { gameData.player.physics.transform.pos.y += CAMERA_SPEED * GetFrameTime(); moving = true; }
+		};
+
+		if (IsKeyDown(KEY_SPACE)) gameData.player.physics.jump(10);
+
+		if (gameData.player.physics.downTouch) 
+		{ 
+			falling = 0; 
+		}
+		else
+		{ 
+			falling = 0; 
+		}
+
+		if (falling)
+		{
+			gameData.player.animations.setAnimation(2);
+		}
+		else if (moving)
+		{
+			gameData.player.animations.setAnimation(1);
+		}
+		else
+		{
+			gameData.player.animations.setAnimation(0);
+		}
+
+		gameData.player.animations.update(deltaTime, 0.08, 7);
+
+
+	}
+
+
 
 #pragma endregion
 
@@ -127,7 +174,7 @@ bool updateGame()
 			entity.physics.updateFinal();
 	};
 	
-	updateEntityPhysics(gameData.player, false);
+	updateEntityPhysics(gameData.player, !creative);
 
 	gameData.camera.target = gameData.player.physics.transform.pos;
 
@@ -368,6 +415,7 @@ bool updateGame()
 
 		ImGui::SliderFloat("Camera zoom:", &gameData.camera.zoom, 10, 150);
 		ImGui::SliderFloat("Camera speed:", &CAMERA_SPEED, 5, 30);
+		ImGui::Checkbox("Creative", &creative);
 
 		if (ImGui::Button("Hurt a slime"))
 		{

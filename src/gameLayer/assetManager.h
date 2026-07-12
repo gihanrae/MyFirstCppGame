@@ -15,5 +15,11 @@ struct AssetManager
 	Texture2D snowBG = {};
 	Texture2D caveBG = {};
 
+	Texture2D playerFeet = {};
+	Texture2D playerBack = {};
+	Texture2D playerFront = {};
+	Texture2D playerHead = {};
+
+
 	void loadAll();
 };

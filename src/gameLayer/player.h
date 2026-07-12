@@ -3,6 +3,7 @@
 #include <physics.h>
 #include <raylib.h>
 #include <entity.h>
+#include <entityAnimation.h>
 
 
 struct AssetManager;
@@ -18,6 +19,8 @@ struct Player : public Entity
 		life = getMaxLife();
 
 	}
+
+	EntityAnimation animations;
 
 	Vector2& getPosition()
 	{
